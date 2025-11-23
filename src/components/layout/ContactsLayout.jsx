@@ -418,7 +418,7 @@ export default function ContactsLayout() {
                   <Button
                     className="flex-1 sm:flex-none"
                     size="sm"
-                    onClick={() => window.open('http://localhost:3000/auth/register', '_blank', 'noopener,noreferrer')}
+                    onClick={() => window.open('https://app.leadsengine.ai/auth/register', '_blank', 'noopener,noreferrer')}
                   >
                     Create Account
                   </Button>
@@ -475,12 +475,12 @@ export default function ContactsLayout() {
                       <TableHead>Action</TableHead>
                     </TableRow>
                   </TableHeader>
-                <TableBody>
-                  {loading && (
-                    <TableRow>
-                      <TableCell colSpan={10} className="text-center text-sm text-muted-foreground">Loading…</TableCell>
-                    </TableRow>
-                  )}
+                  <TableBody>
+                    {loading && (
+                      <TableRow>
+                        <TableCell colSpan={10} className="text-center text-sm text-muted-foreground">Loading…</TableCell>
+                      </TableRow>
+                    )}
                     {error && !loading && rows.length === 0 && (
                       <TableRow>
                         <TableCell colSpan={10} className="text-center text-sm text-destructive">{error}</TableCell>

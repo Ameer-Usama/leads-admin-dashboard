@@ -8,7 +8,15 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-dotenv.config()
+const __filename_env = fileURLToPath(import.meta.url)
+const __dirname_env = path.dirname(__filename_env)
+dotenv.config({ path: path.resolve(__dirname_env, '../.env') })
+
+console.log('Loaded Env:', {
+  SMTP_USER: process.env.SMTP_USER ? 'Set' : 'Not Set',
+  SMTP_HOST: process.env.SMTP_HOST,
+  PWD: process.cwd()
+})
 
 const app = express()
 app.use(cors({ origin: true, credentials: true }))
@@ -113,6 +121,50 @@ const MailThread = mongoose.model(
     { collection: 'mail_threads', timestamps: true }
   )
 )
+
+const Admin = mongoose.model(
+  'Admin',
+  new mongoose.Schema(
+    {
+      username: String,
+      email: String,
+      password: String,
+    },
+    { collection: 'admin_dashboard' }
+  )
+)
+
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body
+  try {
+    const admin = await Admin.findOne({ email, password }).lean()
+    if (admin) {
+      res.json({ ok: true, user: { email: admin.email, username: admin.username } })
+    } else {
+      res.status(401).json({ ok: false, error: 'Invalid credentials' })
+    }
+  } catch (err) {
+    res.status(500).json({ ok: false, error: 'Login failed' })
+  }
+})
+
+app.post('/api/seed-admin', async (req, res) => {
+  try {
+    const exists = await Admin.findOne({ email: 'admin@test.com' })
+    if (!exists) {
+      await Admin.create({
+        username: 'admin',
+        email: 'admin@test.com',
+        password: 'password123'
+      })
+      res.json({ ok: true, message: 'Test admin created' })
+    } else {
+      res.json({ ok: true, message: 'Test admin already exists' })
+    }
+  } catch (err) {
+    res.status(500).json({ ok: false, error: 'Failed to seed admin' })
+  }
+})
 
 app.get('/api/health', (req, res) => {
   const states = ['disconnected', 'connected', 'connecting', 'disconnecting']
@@ -462,7 +514,7 @@ if (SMTP_USER && SMTP_PASS) {
   })
   pooledTransporter.verify()
     .then(() => { console.log('SMTP ready') })
-    .catch((err) => { try { console.error('SMTP verify failed:', String(err && (err.response || err.message) || '').slice(0, 200)) } catch (_) {} })
+    .catch((err) => { try { console.error('SMTP verify failed:', String(err && (err.response || err.message) || '').slice(0, 200)) } catch (_) { } })
 }
 
 app.get('/api/email/health', async (req, res) => {
@@ -492,15 +544,15 @@ app.post('/api/email/send', async (req, res) => {
 
     const normalizedAttachments = Array.isArray(attachments)
       ? attachments
-          .filter((a) => a && a.filename && a.contentBase64)
-          .map((a) => ({ filename: a.filename, content: Buffer.from(a.contentBase64, 'base64'), contentType: a.contentType || undefined }))
+        .filter((a) => a && a.filename && a.contentBase64)
+        .map((a) => ({ filename: a.filename, content: Buffer.from(a.contentBase64, 'base64'), contentType: a.contentType || undefined }))
       : []
     const senderEmail = fromEmail && fromEmail.includes('@') ? fromEmail : SMTP_USER
     let threadSubject = subject
     try {
       const existingThread = await MailThread.findOne({ contactEmail: String(to).trim().toLowerCase() }).lean()
       if (existingThread && existingThread.subject) threadSubject = existingThread.subject
-    } catch (_) {}
+    } catch (_) { }
     const mail = {
       from: fromName ? `${fromName} <${senderEmail}>` : senderEmail,
       to,
@@ -540,7 +592,7 @@ app.post('/api/email/send', async (req, res) => {
         await MailMessage.findByIdAndUpdate(queued._id, { status: 'sent', messageId: info.messageId || '' })
       } catch (err) {
         const msg = (err && (err.response || err.message)) ? String(err.response || err.message).slice(0, 500) : 'unknown error'
-        try { console.error('SMTP send error:', msg) } catch (_) {}
+        try { console.error('SMTP send error:', msg) } catch (_) { }
         await MailMessage.findByIdAndUpdate(queued._id, { status: 'failed', error: msg })
       }
     })
@@ -637,7 +689,7 @@ app.post('/api/chat/sync-inbox', async (req, res) => {
     await client.logout()
     res.json({ ok: true })
   } catch (err) {
-    try { await client.logout() } catch (_) {}
+    try { await client.logout() } catch (_) { }
     res.status(500).json({ ok: false, error: 'Failed to sync inbox' })
   }
 })
@@ -728,5 +780,5 @@ const uploadsDir = path.join(uploadsRoot, 'transactions')
 function ensureUploadsDir() {
   try {
     fs.mkdirSync(uploadsDir, { recursive: true })
-  } catch (_) {}
+  } catch (_) { }
 }
