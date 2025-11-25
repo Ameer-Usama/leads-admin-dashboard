@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   SidebarProvider,
   Sidebar,
@@ -42,10 +42,9 @@ import {
 import {
   Home,
   MessageSquare,
-  Settings,
   User,
-  LifeBuoy,
   ShieldCheck,
+  LogOut,
 } from 'lucide-react'
 
 export default function CmsLayout() {
@@ -55,6 +54,18 @@ export default function CmsLayout() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const location = useLocation()
+  const navigate = useNavigate()
+  const [user, setUser] = useState({ name: 'Julio Morgan', email: 'julio.morgan12@gmail.com' })
+
+  useEffect(() => {
+    const stored = localStorage.getItem('adminUser')
+    if (stored) {
+      try {
+        const u = JSON.parse(stored)
+        setUser({ name: u.name || u.username || 'Admin', email: u.email || 'admin@example.com' })
+      } catch (e) { }
+    }
+  }, [])
 
   useEffect(() => {
     let mounted = true
@@ -164,25 +175,20 @@ export default function CmsLayout() {
 
           {/* Advanced section */}
           <SidebarGroup>
-            <SidebarGroupLabel className="uppercase tracking-wide">Advanced</SidebarGroupLabel>
+            <SidebarGroupLabel className="uppercase tracking-wide">Account</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton size="sm" tooltip="Settings">
-                    <Settings />
-                    <span>Settings</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton size="sm" tooltip="Account">
-                    <User />
-                    <span>Account</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton size="sm" tooltip="Help & Supports">
-                    <LifeBuoy />
-                    <span>Help & Supports</span>
+                  <SidebarMenuButton
+                    size="sm"
+                    tooltip="Logout"
+                    onClick={() => {
+                      localStorage.removeItem('adminUser')
+                      navigate('/login')
+                    }}
+                  >
+                    <LogOut />
+                    <span>Logout</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
@@ -203,12 +209,12 @@ export default function CmsLayout() {
             <DropdownMenuTrigger asChild>
               <div className="ml-auto flex items-center gap-3">
                 <Avatar className="h-9 w-9">
-                  <AvatarImage src="https://api.dicebear.com/7.x/initials/svg?seed=JM" />
-                  <AvatarFallback>JM</AvatarFallback>
+                  <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name)}`} />
+                  <AvatarFallback>{user.name.slice(0, 2).toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div className="hidden sm:block">
-                  <div className="text-sm font-medium">Julio Morgan</div>
-                  <div className="text-xs text-muted-foreground">julio.morgan12@gmail.com</div>
+                  <div className="text-sm font-medium">{user.name}</div>
+                  <div className="text-xs text-muted-foreground">{user.email}</div>
                 </div>
               </div>
             </DropdownMenuTrigger>

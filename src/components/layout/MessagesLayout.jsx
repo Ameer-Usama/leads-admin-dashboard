@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   SidebarProvider,
   Sidebar,
@@ -18,11 +18,12 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Home, MessageSquare, Settings, User, LifeBuoy, ShieldCheck, Search, Send, Loader2, Paperclip, Trash } from 'lucide-react'
+import { Home, MessageSquare, User, ShieldCheck, Search, Send, Loader2, Paperclip, Trash, LogOut } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 export default function MessagesLayout() {
   const location = useLocation()
+  const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [users, setUsers] = useState([])
   const [selectedEmail, setSelectedEmail] = useState('')
@@ -35,6 +36,17 @@ export default function MessagesLayout() {
   const fileInputRef = useRef(null)
   const [emailReady, setEmailReady] = useState(true)
   const [healthMsg, setHealthMsg] = useState('')
+  const [user, setUser] = useState({ name: 'Admin', email: 'admin@example.com' })
+
+  useEffect(() => {
+    const stored = localStorage.getItem('adminUser')
+    if (stored) {
+      try {
+        const u = JSON.parse(stored)
+        setUser({ name: u.name || u.username || 'Admin', email: u.email || 'admin@example.com' })
+      } catch (e) { }
+    }
+  }, [])
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -47,7 +59,7 @@ export default function MessagesLayout() {
           setSelectedEmail(list[0].email)
           setSelectedName(list[0].name || list[0].email)
         }
-      } catch (_) {}
+      } catch (_) { }
     }
     const checkEmailHealth = async () => {
       try {
@@ -169,25 +181,20 @@ export default function MessagesLayout() {
           <SidebarSeparator />
 
           <SidebarGroup>
-            <SidebarGroupLabel className="uppercase tracking-wide">Advanced</SidebarGroupLabel>
+            <SidebarGroupLabel className="uppercase tracking-wide">Account</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton size="sm" tooltip="Settings">
-                    <Settings />
-                    <span>Settings</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton size="sm" tooltip="Account">
-                    <User />
-                    <span>Account</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton size="sm" tooltip="Help & Supports">
-                    <LifeBuoy />
-                    <span>Help & Supports</span>
+                  <SidebarMenuButton
+                    size="sm"
+                    tooltip="Logout"
+                    onClick={() => {
+                      localStorage.removeItem('adminUser')
+                      navigate('/login')
+                    }}
+                  >
+                    <LogOut />
+                    <span>Logout</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
@@ -201,12 +208,12 @@ export default function MessagesLayout() {
           <span className="text-base font-semibold">Messages</span>
           <div className="ml-auto flex items-center gap-3">
             <Avatar className="h-9 w-9">
-              <AvatarImage src="https://api.dicebear.com/7.x/initials/svg?seed=MS" />
-              <AvatarFallback>MS</AvatarFallback>
+              <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name)}`} />
+              <AvatarFallback>{user.name.slice(0, 2).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div className="hidden sm:block">
-              <div className="text-sm font-medium">Admin</div>
-              <div className="text-xs text-muted-foreground">admin@example.com</div>
+              <div className="text-sm font-medium">{user.name}</div>
+              <div className="text-xs text-muted-foreground">{user.email}</div>
             </div>
           </div>
         </div>
@@ -286,7 +293,7 @@ export default function MessagesLayout() {
                       </div>
                     )}
                   </div>
-                <div className="md:col-span-2 flex items-center justify-between">
+                  <div className="md:col-span-2 flex items-center justify-between">
                     <div className="text-xs text-muted-foreground">{healthMsg || resultMsg}</div>
                     <Button onClick={handleSend} disabled={!canSend}>
                       {sending ? (<><Loader2 className="mr-2 size-4 animate-spin" />Sending…</>) : (<><Send className="mr-2 size-4" />Send</>)}

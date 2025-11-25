@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import {
   SidebarProvider,
@@ -22,18 +22,18 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import {
   Home,
   MessageSquare,
-  Settings,
   User,
-  LifeBuoy,
   ShieldCheck,
   UploadCloud,
   Image as ImageIcon,
   X,
   Loader2,
+  LogOut,
 } from 'lucide-react'
 
 export default function PendingVerificationLayout() {
   const location = useLocation()
+  const navigate = useNavigate()
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -43,6 +43,17 @@ export default function PendingVerificationLayout() {
   const [previewOpen, setPreviewOpen] = useState(false)
   const [previewSrc, setPreviewSrc] = useState('')
   const [loadingIds, setLoadingIds] = useState({})
+  const [user, setUser] = useState({ name: 'Admin', email: 'admin@example.com' })
+
+  useEffect(() => {
+    const stored = localStorage.getItem('adminUser')
+    if (stored) {
+      try {
+        const u = JSON.parse(stored)
+        setUser({ name: u.name || u.username || 'Admin', email: u.email || 'admin@example.com' })
+      } catch (e) { }
+    }
+  }, [])
 
   useEffect(() => {
     let mounted = true
@@ -181,25 +192,20 @@ export default function PendingVerificationLayout() {
           <SidebarSeparator />
 
           <SidebarGroup>
-            <SidebarGroupLabel className="uppercase tracking-wide">Advanced</SidebarGroupLabel>
+            <SidebarGroupLabel className="uppercase tracking-wide">Account</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton size="sm" tooltip="Settings">
-                    <Settings />
-                    <span>Settings</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton size="sm" tooltip="Account">
-                    <User />
-                    <span>Account</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton size="sm" tooltip="Help & Supports">
-                    <LifeBuoy />
-                    <span>Help & Supports</span>
+                  <SidebarMenuButton
+                    size="sm"
+                    tooltip="Logout"
+                    onClick={() => {
+                      localStorage.removeItem('adminUser')
+                      navigate('/login')
+                    }}
+                  >
+                    <LogOut />
+                    <span>Logout</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
@@ -213,12 +219,12 @@ export default function PendingVerificationLayout() {
           <span className="text-base font-semibold">Pending Verification</span>
           <div className="ml-auto flex items-center gap-3">
             <Avatar className="h-9 w-9">
-              <AvatarImage src="https://api.dicebear.com/7.x/initials/svg?seed=PV" />
-              <AvatarFallback>PV</AvatarFallback>
+              <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name)}`} />
+              <AvatarFallback>{user.name.slice(0, 2).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div className="hidden sm:block">
-              <div className="text-sm font-medium">Admin</div>
-              <div className="text-xs text-muted-foreground">admin@example.com</div>
+              <div className="text-sm font-medium">{user.name}</div>
+              <div className="text-xs text-muted-foreground">{user.email}</div>
             </div>
           </div>
         </div>
