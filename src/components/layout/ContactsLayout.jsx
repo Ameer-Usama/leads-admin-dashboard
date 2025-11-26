@@ -98,7 +98,7 @@ export default function ContactsLayout() {
     'Pro',
     'Growth',
     'Starter',
-    'Testing',
+    'testing',
   ]
 
   const [activeFilter, setActiveFilter] = useState('All')

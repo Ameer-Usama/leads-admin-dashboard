@@ -43,7 +43,7 @@ app.get('/api/uploads/transactions/:filename', (req, res) => {
 })
 app.use('/api/uploads', express.static(uploadsRoot))
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/leads_engine_v1'
+const MONGODB_URI = process.env.MONGODB_URI
 const PORT = process.env.PORT || 3001
 
 mongoose
