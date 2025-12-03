@@ -134,6 +134,25 @@ const Admin = mongoose.model(
   )
 )
 
+const Lead = mongoose.model(
+  'Lead',
+  new mongoose.Schema(
+    {
+      userId: { type: mongoose.Schema.Types.Mixed },
+      platform: { type: String, enum: ['instagram', 'twitter', 'facebook', 'gmb'] },
+      name: String,
+      email: String,
+      phone: String,
+      location: String,
+      profileUrl: String,
+      followers: Number,
+      bio: String,
+      status: { type: String, default: 'active' },
+    },
+    { collection: 'leads', timestamps: true }
+  )
+)
+
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body
   try {
@@ -166,10 +185,153 @@ app.post('/api/seed-admin', async (req, res) => {
   }
 })
 
+app.post('/api/seed-test-leads', async (req, res) => {
+  try {
+    // Find or create test user with testing package
+    let testUser = await User.findOne({ email: 'test1@gmail.com' })
+    if (!testUser) {
+      testUser = await User.create({
+        email: 'test1@gmail.com',
+        firstName: 'Test',
+        lastName: 'User',
+        phone: '+1234567890',
+        role: 'user',
+        status: 'Active',
+        isActive: true,
+      })
+    }
+
+    // Ensure testing package subscription exists
+    const existingSub = await Subscription.findOne({ userId: testUser._id, package: 'testing' })
+    if (!existingSub) {
+      const exp = new Date()
+      exp.setMonth(exp.getMonth() + 12) // 12 months
+      await Subscription.create({
+        userId: testUser._id,
+        package: 'testing',
+        subscriptionDate: new Date(),
+        expirationDate: exp,
+        gmbLimit: 1000,
+        instaLimit: 1000,
+        twitterLimit: 1000,
+        facebookLimit: 1000,
+      })
+    }
+
+    // Remove existing test leads for this user
+    await Lead.deleteMany({ userId: testUser._id })
+
+    // Helper to generate test leads
+    const generateLeads = (platform, count) => {
+      const leads = []
+      const platformNames = {
+        instagram: ['InstaUser', 'PhotoPro', 'ContentCreator', 'Influencer', 'BrandBuilder'],
+        twitter: ['TwitterUser', 'TechTweeter', 'NewsHawk', 'Blogger', 'Journalist'],
+        facebook: ['FBUser', 'SocialBee', 'CommunityManager', 'PageAdmin', 'GroupMod'],
+        gmb: ['LocalBiz', 'Restaurant', 'Cafe', 'Store', 'Service'],
+      }
+      
+      const names = platformNames[platform] || ['User']
+      
+      for (let i = 1; i <= count; i++) {
+        const baseName = names[i % names.length]
+        leads.push({
+          userId: testUser._id,
+          platform: platform,
+          name: `${baseName}${i}`,
+          email: `${platform}user${i}@example.com`,
+          phone: `+1${String(Math.floor(Math.random() * 10000000000)).padStart(10, '0')}`,
+          location: ['New York, NY', 'Los Angeles, CA', 'Chicago, IL', 'Houston, TX', 'Phoenix, AZ'][i % 5],
+          profileUrl: `https://${platform}.com/${baseName.toLowerCase()}${i}`,
+          followers: Math.floor(Math.random() * 10000) + 100,
+          bio: `${platform} enthusiast and content creator. Love connecting with people!`,
+          status: 'active',
+        })
+      }
+      return leads
+    }
+
+    // Create 50 leads for each platform
+    const instagramLeads = generateLeads('instagram', 50)
+    const twitterLeads = generateLeads('twitter', 50)
+    const facebookLeads = generateLeads('facebook', 50)
+    const gmbLeads = generateLeads('gmb', 50)
+
+    // Batch insert all leads
+    await Lead.insertMany([...instagramLeads, ...twitterLeads, ...facebookLeads, ...gmbLeads])
+
+    res.json({
+      ok: true,
+      message: 'Test leads created successfully',
+      user: {
+        id: String(testUser._id),
+        email: testUser.email,
+        name: `${testUser.firstName} ${testUser.lastName}`,
+      },
+      leadsCreated: {
+        instagram: 50,
+        twitter: 50,
+        facebook: 50,
+        gmb: 50,
+        total: 200,
+      },
+    })
+  } catch (err) {
+    console.error('seed test leads error:', err)
+    res.status(500).json({ ok: false, error: 'Failed to seed test leads', details: err.message })
+  }
+})
+
 app.get('/api/health', (req, res) => {
   const states = ['disconnected', 'connected', 'connecting', 'disconnecting']
   const state = states[mongoose.connection.readyState] || 'unknown'
   res.json({ ok: true, db: state })
+})
+
+// Get leads for a user (with optional platform filter)
+app.get('/api/leads/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params
+    const { platform } = req.query
+    
+    const query = { userId }
+    if (platform) {
+      query.platform = platform
+    }
+    
+    const leads = await Lead.find(query).sort({ createdAt: -1 }).lean()
+    
+    // Count by platform
+    const counts = {
+      instagram: await Lead.countDocuments({ userId, platform: 'instagram' }),
+      twitter: await Lead.countDocuments({ userId, platform: 'twitter' }),
+      facebook: await Lead.countDocuments({ userId, platform: 'facebook' }),
+      gmb: await Lead.countDocuments({ userId, platform: 'gmb' }),
+    }
+    
+    res.json({
+      ok: true,
+      count: leads.length,
+      counts,
+      total: counts.instagram + counts.twitter + counts.facebook + counts.gmb,
+      leads: leads.map(l => ({
+        id: String(l._id),
+        platform: l.platform,
+        name: l.name,
+        email: l.email,
+        phone: l.phone,
+        location: l.location,
+        profileUrl: l.profileUrl,
+        followers: l.followers,
+        bio: l.bio,
+        status: l.status,
+        createdAt: l.createdAt,
+      })),
+    })
+  } catch (err) {
+    console.error('get leads error:', err)
+    res.status(500).json({ ok: false, error: 'Failed to fetch leads' })
+  }
 })
 
 // Aggregate users with subscriptions for contacts table
@@ -428,7 +590,7 @@ app.post('/api/subscriptions', async (req, res) => {
           : key === 'pro'
             ? { gmbLimit: 3000, instaLimit: 3000, twitterLimit: 3000, facebookLimit: 3000 }
             : key === 'testing'
-              ? { gmbLimit: 1000, instaLimit: 0, twitterLimit: 0, facebookLimit: 0 }
+              ? { gmbLimit: 1000, instaLimit: 1000, twitterLimit: 1000, facebookLimit: 1000 }
               : { gmbLimit: 0, instaLimit: 0, twitterLimit: 0, facebookLimit: 0 }
 
     // Optional: save transaction image if provided (base64 data URL or raw base64)
