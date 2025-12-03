@@ -340,7 +340,7 @@ app.get('/api/contacts', async (req, res) => {
     const users = await User.find({}, 'email firstName lastName phone role status isActive').sort({ _id: -1 }).lean()
     const userIds = users.map((u) => String(u._id))
 
-    const subs = await Subscription.find({}, 'userId user package expirationDate transaction_img createdAt').sort({ createdAt: -1 }).lean()
+    const subs = await Subscription.find({}, 'userId user package expirationDate transaction_img gmbLimit instaLimit twitterLimit facebookLimit createdAt').sort({ createdAt: -1 }).lean()
     const latestByUser = new Map()
     const withImageByUser = new Map()
     for (const s of subs) {
@@ -366,6 +366,11 @@ app.get('/api/contacts', async (req, res) => {
         pkg: latest?.package || '',
         exp,
         transaction_img: withImg?.transaction_img || '',
+        // Platform credits/limits
+        instagramCredits: latest?.instaLimit || 0,
+        twitterCredits: latest?.twitterLimit || 0,
+        facebookCredits: latest?.facebookLimit || 0,
+        gmbCredits: latest?.gmbLimit || 0,
       }
     })
 

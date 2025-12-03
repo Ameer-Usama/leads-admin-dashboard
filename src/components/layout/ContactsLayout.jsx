@@ -275,7 +275,18 @@ export default function ContactsLayout() {
 
       // 3) Update UI row
       const expStr = jsonSub?.subscription?.expirationDate ? new Date(jsonSub.subscription.expirationDate).toISOString().slice(0, 10) : ''
-      setRows((prev) => prev.map((r) => (r.id === planDialogUserId ? { ...r, status: 'Active', pkg: selectedPlan, exp: expStr, payment: expStr ? 'Confirmed' : r.payment } : r)))
+      const sub = jsonSub?.subscription || {}
+      setRows((prev) => prev.map((r) => (r.id === planDialogUserId ? { 
+        ...r, 
+        status: 'Active', 
+        pkg: selectedPlan, 
+        exp: expStr, 
+        payment: expStr ? 'Confirmed' : r.payment,
+        instagramCredits: sub.instaLimit || 0,
+        twitterCredits: sub.twitterLimit || 0,
+        facebookCredits: sub.facebookLimit || 0,
+        gmbCredits: sub.gmbLimit || 0,
+      } : r)))
 
       // Close dialog
       setPlanDialogOpen(false)
@@ -457,7 +468,7 @@ export default function ContactsLayout() {
               </div>
 
               <div className="mt-3 w-full overflow-x-auto">
-                <Table className="min-w-[720px] sm:min-w-[960px]">
+                <Table className="min-w-[1200px]">
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-10">
@@ -476,6 +487,10 @@ export default function ContactsLayout() {
                       <TableHead>Package</TableHead>
                       <TableHead>Payment</TableHead>
                       <TableHead>Roles</TableHead>
+                      <TableHead className="text-center">📸 Insta</TableHead>
+                      <TableHead className="text-center">🐦 Twitter</TableHead>
+                      <TableHead className="text-center">📘 FB</TableHead>
+                      <TableHead className="text-center">🏢 GMB</TableHead>
                       <TableHead>Exp-date</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Action</TableHead>
@@ -484,12 +499,12 @@ export default function ContactsLayout() {
                   <TableBody>
                     {loading && (
                       <TableRow>
-                        <TableCell colSpan={10} className="text-center text-sm text-muted-foreground">Loading…</TableCell>
+                        <TableCell colSpan={14} className="text-center text-sm text-muted-foreground">Loading…</TableCell>
                       </TableRow>
                     )}
                     {error && !loading && rows.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={10} className="text-center text-sm text-destructive">{error}</TableCell>
+                        <TableCell colSpan={14} className="text-center text-sm text-destructive">{error}</TableCell>
                       </TableRow>
                     )}
                     {pageRows.map((r) => (
@@ -517,6 +532,26 @@ export default function ContactsLayout() {
                           <Badge className={paymentBadgeClass(r.payment)}>{r.payment}</Badge>
                         </TableCell>
                         <TableCell>{r.role}</TableCell>
+                        <TableCell className="text-center">
+                          <span className={`inline-flex items-center justify-center rounded-md px-2 py-1 text-xs font-medium ${r.instagramCredits > 0 ? 'bg-pink-500/10 text-pink-600' : 'bg-gray-500/10 text-gray-500'}`}>
+                            {r.instagramCredits || 0}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <span className={`inline-flex items-center justify-center rounded-md px-2 py-1 text-xs font-medium ${r.twitterCredits > 0 ? 'bg-blue-500/10 text-blue-600' : 'bg-gray-500/10 text-gray-500'}`}>
+                            {r.twitterCredits || 0}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <span className={`inline-flex items-center justify-center rounded-md px-2 py-1 text-xs font-medium ${r.facebookCredits > 0 ? 'bg-blue-700/10 text-blue-700' : 'bg-gray-500/10 text-gray-500'}`}>
+                            {r.facebookCredits || 0}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <span className={`inline-flex items-center justify-center rounded-md px-2 py-1 text-xs font-medium ${r.gmbCredits > 0 ? 'bg-green-600/10 text-green-600' : 'bg-gray-500/10 text-gray-500'}`}>
+                            {r.gmbCredits || 0}
+                          </span>
+                        </TableCell>
                         <TableCell>{r.exp}</TableCell>
                         <TableCell>
                           <Badge className={statusBadgeClass(r.status)}>{r.status}</Badge>
