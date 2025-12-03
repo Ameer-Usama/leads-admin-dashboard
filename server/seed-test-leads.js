@@ -134,10 +134,10 @@ async function seedTestLeads() {
         package: 'testing',
         subscriptionDate: new Date(),
         expirationDate: exp,
-        gmbLimit: 1000,
-        instaLimit: 1000,
-        twitterLimit: 1000,
-        facebookLimit: 1000,
+        gmbLimit: 50,
+        instaLimit: 50,
+        twitterLimit: 50,
+        facebookLimit: 50,
       })
       console.log('Testing package subscription created')
     } else {

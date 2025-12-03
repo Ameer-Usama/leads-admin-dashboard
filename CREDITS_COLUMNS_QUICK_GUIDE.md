@@ -37,7 +37,7 @@ Added **4 new columns** to the Subscribers table in the Contacts page:
 | Starter | 1,000     | 1,000   | 1,000    | 1,000|
 | Growth  | 2,000     | 2,000   | 2,000    | 2,000|
 | Pro     | 3,000     | 3,000   | 3,000    | 3,000|
-| Testing | 1,000     | 1,000   | 1,000    | 1,000|
+| Testing | 50        | 50      | 50       | 50   |
 | None    | 0         | 0       | 0        | 0    |
 
 ## Benefits for Admin

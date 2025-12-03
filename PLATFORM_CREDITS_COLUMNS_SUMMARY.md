@@ -113,7 +113,7 @@ Each column displays:
 - **Starter**: 1000 credits per platform
 - **Growth**: 2000 credits per platform
 - **Pro**: 3000 credits per platform
-- **Testing**: 1000 GMB, 1000 Instagram, 1000 Twitter, 1000 Facebook
+- **Testing**: 50 per platform (Instagram, Twitter, Facebook, GMB)
 
 ---
 

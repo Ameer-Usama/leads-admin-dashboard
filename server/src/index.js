@@ -211,10 +211,10 @@ app.post('/api/seed-test-leads', async (req, res) => {
         package: 'testing',
         subscriptionDate: new Date(),
         expirationDate: exp,
-        gmbLimit: 1000,
-        instaLimit: 1000,
-        twitterLimit: 1000,
-        facebookLimit: 1000,
+        gmbLimit: 50,
+        instaLimit: 50,
+        twitterLimit: 50,
+        facebookLimit: 50,
       })
     }
 
@@ -595,7 +595,7 @@ app.post('/api/subscriptions', async (req, res) => {
           : key === 'pro'
             ? { gmbLimit: 3000, instaLimit: 3000, twitterLimit: 3000, facebookLimit: 3000 }
             : key === 'testing'
-              ? { gmbLimit: 1000, instaLimit: 1000, twitterLimit: 1000, facebookLimit: 1000 }
+              ? { gmbLimit: 50, instaLimit: 50, twitterLimit: 50, facebookLimit: 50 }
               : { gmbLimit: 0, instaLimit: 0, twitterLimit: 0, facebookLimit: 0 }
 
     // Optional: save transaction image if provided (base64 data URL or raw base64)
