@@ -37,7 +37,7 @@ export default function PendingVerificationLayout() {
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  const planOptions = ['Starter', 'Growth', 'Pro', 'Testing']
+  const planOptions = ['starter', 'growth', 'pro', 'testing', 'trail mode']
   const [selectedPlans, setSelectedPlans] = useState({})
   const [txnImgs, setTxnImgs] = useState({})
   const [previewOpen, setPreviewOpen] = useState(false)
@@ -67,6 +67,7 @@ export default function PendingVerificationLayout() {
         const mapped = data.map((d) => ({
           ...d,
           payment: d.exp ? 'Confirmed' : 'Pending',
+          pkg: (d.pkg || '').toLowerCase(),
         }))
         const filtered = mapped
           .filter((r) => r.payment === 'Pending' || r.status === 'Blocked')
