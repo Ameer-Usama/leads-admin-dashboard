@@ -211,10 +211,10 @@ app.post('/api/seed-test-leads', async (req, res) => {
         package: 'testing',
         subscriptionDate: new Date(),
         expirationDate: exp,
-        gmbLimit: 50,
-        instaLimit: 50,
-        twitterLimit: 50,
-        facebookLimit: 50,
+        gmbLimit: 500,
+        instaLimit: 500,
+        twitterLimit: 500,
+        facebookLimit: 500,
       })
     }
 
@@ -230,9 +230,9 @@ app.post('/api/seed-test-leads', async (req, res) => {
         facebook: ['FBUser', 'SocialBee', 'CommunityManager', 'PageAdmin', 'GroupMod'],
         gmb: ['LocalBiz', 'Restaurant', 'Cafe', 'Store', 'Service'],
       }
-      
+
       const names = platformNames[platform] || ['User']
-      
+
       for (let i = 1; i <= count; i++) {
         const baseName = names[i % names.length]
         leads.push({
@@ -293,14 +293,14 @@ app.get('/api/leads/:userId', async (req, res) => {
   try {
     const { userId } = req.params
     const { platform } = req.query
-    
+
     const query = { userId }
     if (platform) {
       query.platform = platform
     }
-    
+
     const leads = await Lead.find(query).sort({ createdAt: -1 }).lean()
-    
+
     // Count by platform
     const counts = {
       instagram: await Lead.countDocuments({ userId, platform: 'instagram' }),
@@ -308,7 +308,7 @@ app.get('/api/leads/:userId', async (req, res) => {
       facebook: await Lead.countDocuments({ userId, platform: 'facebook' }),
       gmb: await Lead.countDocuments({ userId, platform: 'gmb' }),
     }
-    
+
     res.json({
       ok: true,
       count: leads.length,
@@ -595,8 +595,10 @@ app.post('/api/subscriptions', async (req, res) => {
           : key === 'pro'
             ? { gmbLimit: 3000, instaLimit: 3000, twitterLimit: 3000, facebookLimit: 3000 }
             : key === 'testing'
-              ? { gmbLimit: 50, instaLimit: 50, twitterLimit: 50, facebookLimit: 50 }
-              : { gmbLimit: 0, instaLimit: 0, twitterLimit: 0, facebookLimit: 0 }
+              ? { gmbLimit: 500, instaLimit: 500, twitterLimit: 500, facebookLimit: 500 }
+              : key === 'trail mode'
+                ? { gmbLimit: 50, instaLimit: 50, twitterLimit: 50, facebookLimit: 50 }
+                : { gmbLimit: 0, instaLimit: 0, twitterLimit: 0, facebookLimit: 0 }
 
     // Optional: save transaction image if provided (base64 data URL or raw base64)
     let transactionImageUrl = ''
@@ -632,7 +634,7 @@ app.post('/api/subscriptions', async (req, res) => {
 
     const created = await Subscription.create({
       userId: userIdValue,
-      package: pkg,
+      package: key,
       subscriptionDate: new Date(),
       expirationDate: exp,
       ...limits,

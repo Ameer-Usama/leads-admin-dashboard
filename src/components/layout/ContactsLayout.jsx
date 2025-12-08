@@ -91,17 +91,18 @@ export default function ContactsLayout() {
 
   // Contacts data and filters
   const filters = [
-    'All',
-    'Active',
-    'Blocked',
-    'Waiting',
-    'Pro',
-    'Growth',
-    'Starter',
+    'all',
+    'active',
+    'blocked',
+    'waiting',
+    'pro',
+    'growth',
+    'starter',
     'testing',
+    'trail mode',
   ]
 
-  const [activeFilter, setActiveFilter] = useState('All')
+  const [activeFilter, setActiveFilter] = useState('all')
   const [query, setQuery] = useState('')
   const [selectedIds, setSelectedIds] = useState([])
   const selectAllRef = useRef(null)
@@ -118,7 +119,7 @@ export default function ContactsLayout() {
   const [planDialogUserId, setPlanDialogUserId] = useState(null)
   const [selectedPlan, setSelectedPlan] = useState('')
   const [planSubmitting, setPlanSubmitting] = useState(false)
-  const planOptions = ['Starter', 'Growth', 'Pro', 'Testing']
+  const planOptions = ['starter', 'growth', 'pro', 'testing', 'trail mode']
   const [transactionImageBase64, setTransactionImageBase64] = useState('')
   const [transactionImageName, setTransactionImageName] = useState('')
   const fileInputRef = useRef(null)
@@ -145,11 +146,11 @@ export default function ContactsLayout() {
       r.name.toLowerCase().includes(q) ||
       r.id.toLowerCase().includes(q)
 
-    if (activeFilter === 'All') return matchesQuery
-    if (['Active', 'Blocked', 'Waiting'].includes(activeFilter)) {
-      return matchesQuery && r.status === activeFilter
+    if (activeFilter === 'all') return matchesQuery
+    if (['active', 'blocked', 'waiting'].includes(activeFilter)) {
+      return matchesQuery && (r.status || '').toLowerCase() === activeFilter
     }
-    return matchesQuery && r.pkg === activeFilter
+    return matchesQuery && (r.pkg || '').toLowerCase() === activeFilter
   })
 
   // Pagination derived values
@@ -276,11 +277,11 @@ export default function ContactsLayout() {
       // 3) Update UI row
       const expStr = jsonSub?.subscription?.expirationDate ? new Date(jsonSub.subscription.expirationDate).toISOString().slice(0, 10) : ''
       const sub = jsonSub?.subscription || {}
-      setRows((prev) => prev.map((r) => (r.id === planDialogUserId ? { 
-        ...r, 
-        status: 'Active', 
-        pkg: selectedPlan, 
-        exp: expStr, 
+      setRows((prev) => prev.map((r) => (r.id === planDialogUserId ? {
+        ...r,
+        status: 'Active',
+        pkg: selectedPlan,
+        exp: expStr,
         payment: expStr ? 'Confirmed' : r.payment,
         instagramCredits: sub.instaLimit || 0,
         twitterCredits: sub.twitterLimit || 0,
