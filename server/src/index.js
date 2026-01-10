@@ -84,11 +84,14 @@ const Subscription = mongoose.model(
       instaLimit: { type: Number, default: 0 },
       twitterLimit: { type: Number, default: 0 },
       facebookLimit: { type: Number, default: 0 },
+      readyToBuyLimit: { type: Number, default: 0 },
+      isLifetime: { type: Boolean, default: false },
       transaction_img: String,
     },
     { collection: 'subscriptions', timestamps: true }
   )
 )
+
 
 const MailMessage = mongoose.model(
   'MailMessage',
@@ -645,6 +648,7 @@ app.post('/api/subscriptions', async (req, res) => {
       subscriptionDate: new Date(),
       expirationDate: exp,
       ...limits,
+      isLifetime: key === 'lifetime',
       transaction_img: transactionImageUrl,
     })
 
