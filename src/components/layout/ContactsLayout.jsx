@@ -119,7 +119,7 @@ export default function ContactsLayout() {
   const [planDialogUserId, setPlanDialogUserId] = useState(null)
   const [selectedPlan, setSelectedPlan] = useState('')
   const [planSubmitting, setPlanSubmitting] = useState(false)
-  const planOptions = ['starter', 'growth', 'pro', 'testing', 'trail mode']
+  const planOptions = ['starter', 'growth', 'pro', 'testing', 'trail mode', 'lifetime']
   const [transactionImageBase64, setTransactionImageBase64] = useState('')
   const [transactionImageName, setTransactionImageName] = useState('')
   const fileInputRef = useRef(null)

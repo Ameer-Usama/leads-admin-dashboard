@@ -566,9 +566,13 @@ app.post('/api/subscriptions', async (req, res) => {
       return res.status(404).json({ ok: false, error: 'User not found' })
     }
 
-    // Compute expiration
+    // Compute expiration (null for lifetime package)
+    const keyForExp = String(pkg).trim().toLowerCase()
     let exp = null
-    if (expirationDate) {
+    if (keyForExp === 'lifetime') {
+      // Lifetime package never expires
+      exp = null
+    } else if (expirationDate) {
       const d = new Date(expirationDate)
       exp = isNaN(d.getTime()) ? null : d
     } else if (typeof months === 'number' && months > 0) {
@@ -587,6 +591,7 @@ app.post('/api/subscriptions', async (req, res) => {
 
     // Plan limits mapping (case-insensitive)
     const key = String(pkg).trim().toLowerCase()
+    const isLifetime = key === 'lifetime'
     const limits =
       key === 'starter'
         ? { gmbLimit: 1000, instaLimit: 1000, twitterLimit: 1000, facebookLimit: 1000 }
@@ -598,7 +603,9 @@ app.post('/api/subscriptions', async (req, res) => {
               ? { gmbLimit: 500, instaLimit: 500, twitterLimit: 500, facebookLimit: 500 }
               : key === 'trail mode'
                 ? { gmbLimit: 50, instaLimit: 50, twitterLimit: 50, facebookLimit: 50 }
-                : { gmbLimit: 0, instaLimit: 0, twitterLimit: 0, facebookLimit: 0 }
+                : key === 'lifetime'
+                  ? { gmbLimit: 20, instaLimit: 20, twitterLimit: 20, facebookLimit: 20, readyToBuyLimit: 5000 }
+                  : { gmbLimit: 0, instaLimit: 0, twitterLimit: 0, facebookLimit: 0 }
 
     // Optional: save transaction image if provided (base64 data URL or raw base64)
     let transactionImageUrl = ''
