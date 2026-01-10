@@ -88,9 +88,9 @@ export default function PendingVerificationLayout() {
     if (!pkg) return
     try {
       const row = rows.find((x) => x.id === id)
-      const isLifetime = pkg.toLowerCase() === 'lifetime'
-      if (row && row.payment === 'Pending' && !(txnImgs[id]?.base64) && !isLifetime) {
-        alert('Pending status ke liye transaction image upload karna zaroori hai.')
+      const isTrailMode = pkg.toLowerCase() === 'trail mode' || pkg.toLowerCase() === 'trail'
+      if (row && row.payment === 'Pending' && !(txnImgs[id]?.base64) && !isTrailMode) {
+        alert('Pending status ke liye transaction image upload karna zaroori hai (Trail Mode free hai).')
         return
       }
       setLoadingIds((prev) => ({ ...prev, [id]: true }))
@@ -317,8 +317,8 @@ export default function PendingVerificationLayout() {
                           <img src={txnImgs[r.id]?.base64} alt="Preview" className="h-24 w-24 rounded-md object-cover border" />
                         </div>
                       )}
-                      {r.payment === 'Pending' && !txnImgs[r.id]?.base64 && (selectedPlans[r.id] || r.pkg || '').toLowerCase() !== 'lifetime' && (
-                        <div className="mt-2 text-xs text-destructive">Pending status users ke liye image upload required hai.</div>
+                      {r.payment === 'Pending' && !txnImgs[r.id]?.base64 && !['trail mode', 'trail'].includes((selectedPlans[r.id] || r.pkg || '').toLowerCase()) && (
+                        <div className="mt-2 text-xs text-destructive">Pending status users ke liye image upload required hai (Trail Mode free hai).</div>
                       )}
                     </div>
                   </div>
@@ -330,7 +330,7 @@ export default function PendingVerificationLayout() {
                       ))}
                     </div>
                     <div className="mt-4 flex gap-2">
-                      <Button onClick={() => handleActivate(r.id)} disabled={!!loadingIds[r.id] || (r.payment === 'Pending' && (selectedPlans[r.id] || r.pkg || '').toLowerCase() !== 'lifetime' ? !txnImgs[r.id]?.base64 : false) || (!selectedPlans[r.id] && !r.pkg)}>
+                      <Button onClick={() => handleActivate(r.id)} disabled={!!loadingIds[r.id] || (r.payment === 'Pending' && !['trail mode', 'trail'].includes((selectedPlans[r.id] || r.pkg || '').toLowerCase()) ? !txnImgs[r.id]?.base64 : false) || (!selectedPlans[r.id] && !r.pkg)}>
                         {loadingIds[r.id] ? (<><Loader2 className="mr-2 size-4 animate-spin" />Processing…</>) : 'Active'}
                       </Button>
                       <Button variant="destructive" onClick={() => handleDelete(r.id)} disabled={!!loadingIds[r.id]}>
