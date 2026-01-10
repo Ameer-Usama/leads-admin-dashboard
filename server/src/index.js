@@ -442,37 +442,43 @@ app.patch('/api/users/:id', async (req, res) => {
     if (recipient && pooledTransporter) {
       const senderEmail = SMTP_USER
       let mail = null
-      const loginUrl = 'http://localhost:3000/auth/login'
+      const loginUrl = 'https://app.leadsengine.ai/auth/login'
+      const supportUrl = 'https://leadsengine.ai/contact.html'
       if (!wasActive && nowActive) {
         mail = {
           from: `Leads Engine AI <${senderEmail}>`,
           to: recipient,
-          subject: 'Account status updated: Active',
+          subject: '🎉 Your Account is Now Active!',
           text: `Your Leads Engine AI account is now Active. Login: ${loginUrl}`,
           html: `
-            <div style="font-family:Arial,sans-serif;line-height:1.5;color:#111">
-              <h2 style="margin:0 0 8px">Your account is now Active</h2>
-              <p style="margin:0 0 12px">Welcome back! Click the button below to login.</p>
+            <div style="font-family:Arial,sans-serif;line-height:1.5;color:#111;max-width:600px;margin:0 auto;padding:20px">
+              <h2 style="margin:0 0 8px;color:#10b981">🎉 Your Account is Now Active!</h2>
+              <p style="margin:0 0 12px">Great news! Your payment has been verified and your account is now fully activated.</p>
+              <p style="margin:0 0 12px">You now have full access to all your subscription features. Start generating leads today!</p>
               <p style="margin:0 0 16px">
-                <a href="${loginUrl}" style="display:inline-block;background:#2563eb;color:#fff;text-decoration:none;padding:10px 16px;border-radius:6px">Login</a>
+                <a href="${loginUrl}" style="display:inline-block;background:#10b981;color:#fff;text-decoration:none;padding:12px 24px;border-radius:6px;font-weight:bold">Login to Dashboard</a>
               </p>
-              <p style="font-size:12px;color:#555;margin:0">If the button doesn’t work, copy and paste this link: ${loginUrl}</p>
+              <p style="font-size:12px;color:#555;margin:16px 0 0">If the button doesn't work, copy and paste this link: ${loginUrl}</p>
+              <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
+              <p style="font-size:12px;color:#666;margin:0">Need help? <a href="${supportUrl}" style="color:#2563eb">Contact Support</a></p>
             </div>`,
         }
       } else if (wasActive && !nowActive) {
         mail = {
           from: `Leads Engine AI <${senderEmail}>`,
           to: recipient,
-          subject: 'Account status updated: Blocked',
-          text: `Your Leads Engine AI account has been Blocked. You may try to login here: ${loginUrl}`,
+          subject: 'Account Status Update: Blocked',
+          text: `Your Leads Engine AI account has been Blocked. Contact support: ${supportUrl}`,
           html: `
-            <div style="font-family:Arial,sans-serif;line-height:1.5;color:#111">
-              <h2 style="margin:0 0 8px">Your account has been Blocked</h2>
-              <p style="margin:0 0 12px">If you believe this is a mistake, please reach out to support.</p>
+            <div style="font-family:Arial,sans-serif;line-height:1.5;color:#111;max-width:600px;margin:0 auto;padding:20px">
+              <h2 style="margin:0 0 8px;color:#ef4444">Your Account Has Been Blocked</h2>
+              <p style="margin:0 0 12px">Your account access has been temporarily suspended.</p>
+              <p style="margin:0 0 12px">If you believe this is a mistake, please contact our support team.</p>
               <p style="margin:0 0 16px">
-                <a href="${loginUrl}" style="display:inline-block;background:#ef4444;color:#fff;text-decoration:none;padding:10px 16px;border-radius:6px">Login</a>
+                <a href="${supportUrl}" style="display:inline-block;background:#2563eb;color:#fff;text-decoration:none;padding:12px 24px;border-radius:6px;font-weight:bold">Contact Support</a>
               </p>
-              <p style="font-size:12px;color:#555;margin:0">If the button doesn’t work, copy and paste this link: ${loginUrl}</p>
+              <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
+              <p style="font-size:12px;color:#666;margin:0">Need help? <a href="${supportUrl}" style="color:#2563eb">Contact Support</a></p>
             </div>`,
         }
       } else {
@@ -482,32 +488,37 @@ app.patch('/api/users/:id', async (req, res) => {
           mail = {
             from: `Leads Engine AI <${senderEmail}>`,
             to: recipient,
-            subject: 'Account status updated: Active',
+            subject: '🎉 Your Account is Now Active!',
             text: `Your Leads Engine AI account is now Active. Login: ${loginUrl}`,
             html: `
-              <div style="font-family:Arial,sans-serif;line-height:1.5;color:#111">
-                <h2 style="margin:0 0 8px">Your account is now Active</h2>
-                <p style="margin:0 0 12px">Welcome back! Click the button below to login.</p>
+              <div style="font-family:Arial,sans-serif;line-height:1.5;color:#111;max-width:600px;margin:0 auto;padding:20px">
+                <h2 style="margin:0 0 8px;color:#10b981">🎉 Your Account is Now Active!</h2>
+                <p style="margin:0 0 12px">Great news! Your payment has been verified and your account is now fully activated.</p>
+                <p style="margin:0 0 12px">You now have full access to all your subscription features. Start generating leads today!</p>
                 <p style="margin:0 0 16px">
-                  <a href="${loginUrl}" style="display:inline-block;background:#2563eb;color:#fff;text-decoration:none;padding:10px 16px;border-radius:6px">Login</a>
+                  <a href="${loginUrl}" style="display:inline-block;background:#10b981;color:#fff;text-decoration:none;padding:12px 24px;border-radius:6px;font-weight:bold">Login to Dashboard</a>
                 </p>
-                <p style="font-size:12px;color:#555;margin:0">If the button doesn’t work, copy and paste this link: ${loginUrl}</p>
+                <p style="font-size:12px;color:#555;margin:16px 0 0">If the button doesn't work, copy and paste this link: ${loginUrl}</p>
+                <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
+                <p style="font-size:12px;color:#666;margin:0">Need help? <a href="${supportUrl}" style="color:#2563eb">Contact Support</a></p>
               </div>`,
           }
         } else if (p !== 'blocked' && n === 'blocked') {
           mail = {
             from: `Leads Engine AI <${senderEmail}>`,
             to: recipient,
-            subject: 'Account status updated: Blocked',
-            text: `Your Leads Engine AI account has been Blocked. You may try to login here: ${loginUrl}`,
+            subject: 'Account Status Update: Blocked',
+            text: `Your Leads Engine AI account has been Blocked. Contact support: ${supportUrl}`,
             html: `
-              <div style="font-family:Arial,sans-serif;line-height:1.5;color:#111">
-                <h2 style="margin:0 0 8px">Your account has been Blocked</h2>
-                <p style="margin:0 0 12px">If you believe this is a mistake, please reach out to support.</p>
+              <div style="font-family:Arial,sans-serif;line-height:1.5;color:#111;max-width:600px;margin:0 auto;padding:20px">
+                <h2 style="margin:0 0 8px;color:#ef4444">Your Account Has Been Blocked</h2>
+                <p style="margin:0 0 12px">Your account access has been temporarily suspended.</p>
+                <p style="margin:0 0 12px">If you believe this is a mistake, please contact our support team.</p>
                 <p style="margin:0 0 16px">
-                  <a href="${loginUrl}" style="display:inline-block;background:#ef4444;color:#fff;text-decoration:none;padding:10px 16px;border-radius:6px">Login</a>
+                  <a href="${supportUrl}" style="display:inline-block;background:#2563eb;color:#fff;text-decoration:none;padding:12px 24px;border-radius:6px;font-weight:bold">Contact Support</a>
                 </p>
-                <p style="font-size:12px;color:#555;margin:0">If the button doesn’t work, copy and paste this link: ${loginUrl}</p>
+                <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
+                <p style="font-size:12px;color:#666;margin:0">Need help? <a href="${supportUrl}" style="color:#2563eb">Contact Support</a></p>
               </div>`,
           }
         }
