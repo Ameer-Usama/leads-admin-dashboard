@@ -249,7 +249,8 @@ export default function ContactsLayout() {
   }
 
   const handleConfirmPlanAndUnblock = async () => {
-    if (!planDialogUserId || !selectedPlan || !transactionImageBase64) return
+    const isLifetime = (selectedPlan || '').toLowerCase() === 'lifetime'
+    if (!planDialogUserId || !selectedPlan || (!transactionImageBase64 && !isLifetime)) return
     try {
       setPlanSubmitting(true)
       // 1) Create subscription with selected plan
@@ -607,7 +608,7 @@ export default function ContactsLayout() {
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>User ko unblock karne se pehle plan select karein</DialogTitle>
-                    <DialogDescription>Payment pending hai. Pehle transaction image upload karein, phir plan select karein.</DialogDescription>
+                    <DialogDescription>Payment pending hai. Transaction image upload karein (lifetime ke liye optional), phir plan select karein.</DialogDescription>
                   </DialogHeader>
                   <div className="mt-2">
                     <input
@@ -677,7 +678,7 @@ export default function ContactsLayout() {
                     <DialogClose asChild>
                       <Button variant="outline" size="sm" disabled={planSubmitting}>Cancel</Button>
                     </DialogClose>
-                    <Button size="sm" onClick={handleConfirmPlanAndUnblock} disabled={!selectedPlan || !transactionImageBase64 || planSubmitting}>
+                    <Button size="sm" onClick={handleConfirmPlanAndUnblock} disabled={!selectedPlan || (!transactionImageBase64 && selectedPlan.toLowerCase() !== 'lifetime') || planSubmitting}>
                       {planSubmitting ? 'Saving…' : 'Confirm & Unblock'}
                     </Button>
                   </DialogFooter>

@@ -592,23 +592,23 @@ app.post('/api/subscriptions', async (req, res) => {
     // Store Mixed user id (ObjectId if valid, else string)
     const userIdValue = mongoose.Types.ObjectId.isValid(userId) ? new mongoose.Types.ObjectId(userId) : userId
 
-    // Plan limits mapping (case-insensitive)
+    // Plan limits mapping (case-insensitive) - matching leads-engine-ai
     const key = String(pkg).trim().toLowerCase()
     const isLifetime = key === 'lifetime'
     const limits =
       key === 'starter'
-        ? { gmbLimit: 1000, instaLimit: 1000, twitterLimit: 1000, facebookLimit: 1000 }
+        ? { gmbLimit: 1000, instaLimit: 1000, twitterLimit: 1000, facebookLimit: 1000, readyToBuyLimit: 5000 }
         : key === 'growth'
-          ? { gmbLimit: 2000, instaLimit: 2000, twitterLimit: 2000, facebookLimit: 2000 }
+          ? { gmbLimit: 2000, instaLimit: 2000, twitterLimit: 2000, facebookLimit: 2000, readyToBuyLimit: 5000 }
           : key === 'pro'
-            ? { gmbLimit: 3000, instaLimit: 3000, twitterLimit: 3000, facebookLimit: 3000 }
+            ? { gmbLimit: 3000, instaLimit: 3000, twitterLimit: 3000, facebookLimit: 3000, readyToBuyLimit: 5000 }
             : key === 'testing'
-              ? { gmbLimit: 500, instaLimit: 500, twitterLimit: 500, facebookLimit: 500 }
-              : key === 'trail mode'
-                ? { gmbLimit: 50, instaLimit: 50, twitterLimit: 50, facebookLimit: 50 }
+              ? { gmbLimit: 500, instaLimit: 500, twitterLimit: 500, facebookLimit: 500, readyToBuyLimit: 3000 }
+              : key === 'trail mode' || key === 'trail'
+                ? { gmbLimit: 50, instaLimit: 50, twitterLimit: 50, facebookLimit: 50, readyToBuyLimit: 1000 }
                 : key === 'lifetime'
                   ? { gmbLimit: 20, instaLimit: 20, twitterLimit: 20, facebookLimit: 20, readyToBuyLimit: 5000 }
-                  : { gmbLimit: 0, instaLimit: 0, twitterLimit: 0, facebookLimit: 0 }
+                  : { gmbLimit: 0, instaLimit: 0, twitterLimit: 0, facebookLimit: 0, readyToBuyLimit: 0 }
 
     // Optional: save transaction image if provided (base64 data URL or raw base64)
     let transactionImageUrl = ''
