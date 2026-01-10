@@ -100,6 +100,7 @@ export default function ContactsLayout() {
     'starter',
     'testing',
     'trail mode',
+    'lifetime',
   ]
 
   const [activeFilter, setActiveFilter] = useState('all')
