@@ -493,6 +493,7 @@ export default function ContactsLayout() {
                       <TableHead className="text-center">🐦 Twitter</TableHead>
                       <TableHead className="text-center">📘 FB</TableHead>
                       <TableHead className="text-center">🏢 GMB</TableHead>
+                      <TableHead className="text-center">🚀 Ready</TableHead>
                       <TableHead>Exp-date</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Action</TableHead>
@@ -501,12 +502,12 @@ export default function ContactsLayout() {
                   <TableBody>
                     {loading && (
                       <TableRow>
-                        <TableCell colSpan={14} className="text-center text-sm text-muted-foreground">Loading…</TableCell>
+                        <TableCell colSpan={15} className="text-center text-sm text-muted-foreground">Loading…</TableCell>
                       </TableRow>
                     )}
                     {error && !loading && rows.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={14} className="text-center text-sm text-destructive">{error}</TableCell>
+                        <TableCell colSpan={15} className="text-center text-sm text-destructive">{error}</TableCell>
                       </TableRow>
                     )}
                     {pageRows.map((r) => (
@@ -552,6 +553,11 @@ export default function ContactsLayout() {
                         <TableCell className="text-center">
                           <span className={`inline-flex items-center justify-center rounded-md px-2 py-1 text-xs font-medium ${r.gmbCredits > 0 ? 'bg-green-600/10 text-green-600' : 'bg-gray-500/10 text-gray-500'}`}>
                             {r.gmbCredits || 0}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <span className={`inline-flex items-center justify-center rounded-md px-2 py-1 text-xs font-medium ${r.readyToBuyCredits > 0 ? 'bg-orange-500/10 text-orange-600' : 'bg-gray-500/10 text-gray-500'}`}>
+                            {r.readyToBuyCredits || 0}
                           </span>
                         </TableCell>
                         <TableCell>{r.exp}</TableCell>
