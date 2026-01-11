@@ -89,7 +89,8 @@ export default function PendingVerificationLayout() {
     try {
       const row = rows.find((x) => x.id === id)
       const isTrailMode = pkg.toLowerCase() === 'trail mode' || pkg.toLowerCase() === 'trail'
-      if (row && row.payment === 'Pending' && !(txnImgs[id]?.base64) && !isTrailMode) {
+      const hasScreenshot = !!(txnImgs[id]?.base64 || row?.transaction_img)
+      if (row && row.payment === 'Pending' && !hasScreenshot && !isTrailMode) {
         alert('Pending status ke liye transaction image upload karna zaroori hai (Trail Mode free hai).')
         return
       }
@@ -317,7 +318,7 @@ export default function PendingVerificationLayout() {
                           <img src={txnImgs[r.id]?.base64} alt="Preview" className="h-24 w-24 rounded-md object-cover border" />
                         </div>
                       )}
-                      {r.payment === 'Pending' && !txnImgs[r.id]?.base64 && !['trail mode', 'trail'].includes((selectedPlans[r.id] || r.pkg || '').toLowerCase()) && (
+                      {r.payment === 'Pending' && !(txnImgs[r.id]?.base64 || r.transaction_img) && !['trail mode', 'trail'].includes((selectedPlans[r.id] || r.pkg || '').toLowerCase()) && (
                         <div className="mt-2 text-xs text-destructive">Pending status users ke liye image upload required hai (Trail Mode free hai).</div>
                       )}
                     </div>
@@ -330,7 +331,7 @@ export default function PendingVerificationLayout() {
                       ))}
                     </div>
                     <div className="mt-4 flex gap-2">
-                      <Button onClick={() => handleActivate(r.id)} disabled={!!loadingIds[r.id] || (r.payment === 'Pending' && !['trail mode', 'trail'].includes((selectedPlans[r.id] || r.pkg || '').toLowerCase()) ? !txnImgs[r.id]?.base64 : false) || (!selectedPlans[r.id] && !r.pkg)}>
+                      <Button onClick={() => handleActivate(r.id)} disabled={!!loadingIds[r.id] || (r.payment === 'Pending' && !['trail mode', 'trail'].includes((selectedPlans[r.id] || r.pkg || '').toLowerCase()) ? !(txnImgs[r.id]?.base64 || r.transaction_img) : false) || (!selectedPlans[r.id] && !r.pkg)}>
                         {loadingIds[r.id] ? (<><Loader2 className="mr-2 size-4 animate-spin" />Processing…</>) : 'Active'}
                       </Button>
                       <Button variant="destructive" onClick={() => handleDelete(r.id)} disabled={!!loadingIds[r.id]}>
