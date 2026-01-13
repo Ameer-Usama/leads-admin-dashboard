@@ -66,7 +66,7 @@ export default function PendingVerificationLayout() {
         const data = Array.isArray(json?.data) ? json.data : []
         const mapped = data.map((d) => ({
           ...d,
-          payment: d.exp ? 'Confirmed' : 'Pending',
+          payment: d.exp || (d.pkg || '').toLowerCase() === 'lifetime' ? 'Confirmed' : 'Pending',
           pkg: (d.pkg || '').toLowerCase(),
         }))
         const filtered = mapped

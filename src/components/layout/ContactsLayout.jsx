@@ -182,7 +182,7 @@ export default function ContactsLayout() {
           data
             .map((d) => ({
               ...d,
-              payment: d.exp ? 'Confirmed' : 'Pending',
+              payment: d.exp || (d.pkg || '').toLowerCase() === 'lifetime' ? 'Confirmed' : 'Pending',
             }))
             .sort((a, b) => (a.id < b.id ? 1 : -1))
         )
@@ -284,7 +284,7 @@ export default function ContactsLayout() {
         status: 'Active',
         pkg: selectedPlan,
         exp: expStr,
-        payment: expStr ? 'Confirmed' : r.payment,
+        payment: expStr || selectedPlan.toLowerCase() === 'lifetime' ? 'Confirmed' : r.payment,
         instagramCredits: sub.instaLimit || 0,
         twitterCredits: sub.twitterLimit || 0,
         facebookCredits: sub.facebookLimit || 0,
